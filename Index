@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Soil Judging Club</title>
+  <meta name="description" content="Soil Judging Club — learn profiles, master horizons, compete nationally, and build community." />
+  <meta name="color-scheme" content="light dark" />
+  <style>
+    /* ============================
+       CSS: Earthy, responsive, animated
+       ============================ */
+    :root {
+      --bg: #faf7f2;
+      --surface: #ffffff;
+      --text: #1c1b19;
+      --muted: #6b645c;
+      --primary: #6a4c3b;   /* humus-brown */
+      --primary-600: #5a3f30;
+      --accent: #8bb174;    /* plant green */
+      --accent-600: #6e945a;
+      --sand: #e7dbc8;
+      --clay: #c88a5b;
+      --loam: #a67458;
+      --ring: rgba(106,76,59,.15);
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
+      --radius: 18px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f0e0d;
+        --surface: #161413;
+        --text: #efebe6;
+        --muted: #b6afa5;
+        --primary: #b89278;
+        --primary-600: #d3ad90;
+        --accent: #9bd27a;
+        --accent-600: #b2e392;
+        --sand: #3a342d;
+        --clay: #8a5a3a;
+        --loam: #6b4a3a;
+        --ring: rgba(255,255,255,.12);
+        --shadow: 0 10px 30px rgba(0,0,0,.45);
+      }
+    }
+
+    * { box-sizing: border-box }
+    html, body { height: 100% }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: radial-gradient(1200px 600px at 10% -10%, var(--sand), transparent 70%),
+                  radial-gradient(900px 500px at 90% -10%, var(--loam), transparent 70%),
+                  var(--bg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none }
+    img { max-width: 100%; display: block }
+    .container { width: min(1100px, 92vw); margin-inline: auto }
+    .btn {
+      display: inline-flex; align-items: center; gap: .6rem; 
+      padding: .9rem 1.15rem; border-radius: 999px; 
+      border: 1px solid var(--ring); background: var(--text); color: #fff;
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+      font-weight: 650; letter-spacing: .2px;
+    }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,.12) }
+    .btn--alt { background: var(--accent); color: #0b180a }
+    .btn--ghost { background: transparent; color: var(--text) }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; inset-inline: 0; z-index: 50;
+      backdrop-filter: saturate(1.2) blur(8px);
+      background: color-mix(in oklab, var(--bg) 70%, transparent);
+      border-bottom: 1px solid var(--ring);
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: .8rem 0;
+    }
+    .brand { display: flex; align-items: center; gap: .8rem; font-weight: 800; }
+    .brand .logo {
+      width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center;
+      background: conic-gradient(from 220deg, var(--clay), var(--loam), var(--sand));
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.15), var(--shadow);
+    }
+    .brand small { display:block; color: var(--muted); font-weight: 600; letter-spacing: .3px }
+
+    nav ul { display: flex; gap: 1rem; align-items: center; list-style: none; margin: 0; padding: 0 }
+    nav a { padding: .55rem .8rem; border-radius: 999px; border: 1px solid transparent }
+    nav a:hover { background: color-mix(in oklab, var(--sand) 35%, transparent); border-color: var(--ring) }
+
+    .nav-actions { display:flex; gap:.6rem; align-items:center }
+
+    /* Mobile nav */
+    .burger { display:none; width:42px; height:42px; border-radius:12px; border:1px solid var(--ring); background: var(--surface); }
+    .burger span{ display:block; width:22px; height:2px; background:var(--text); margin:6px auto; border-radius:2px; transition: transform .3s ease }
+    @media (max-width: 900px){
+      nav ul { display:none }
+      .burger { display:block }
+    }
+
+    /* Hero */
+    .hero { position: relative; isolation: isolate; }
+    .hero .container { display: grid; grid-template-columns: 1.1fr .9fr; gap: 2.4rem; align-items: center; padding: 5.5rem 0 3rem }
+    @media (max-width: 900px){ .hero .container{ grid-template-columns: 1fr; padding: 3.6rem 0 2rem } }
+
+    .headline { font-size: clamp(2.2rem, 3.4vw + 1rem, 4rem); line-height: 1.05; margin: 0 0 1rem; letter-spacing: -.5px }
+    .kicker { text-transform: uppercase; letter-spacing: 2px; font-weight: 800; color: var(--accent); font-size: .9rem }
+    .subhead { color: var(--muted); font-size: clamp(1rem, .25vw + 1rem, 1.2rem); margin: .8rem 0 1.4rem }
+    .cta { display:flex; gap:.8rem; flex-wrap:wrap }
+
+    /* Soil Layers Card */
+    .soil-card {
+      background: var(--surface); border-radius: var(--radius); border: 1px solid var(--ring); padding: 1rem; position: relative; overflow: hidden; box-shadow: var(--shadow);
+    }
+    .soil {
+      height: 380px; border-radius: calc(var(--radius) - 8px); overflow: hidden; border: 1px solid var(--ring);
+      background:
+        linear-gradient( to bottom, rgba(255,255,255,.08), transparent 20% ),
+        repeating-linear-gradient( to bottom,
+          #eadcc8 0 9%, /* O horizon */
+          #eadcc8 9% 10%,
+          #d2c1a4 10% 19%, /* A horizon */
+          #d2c1a4 19% 20%,
+          #b79771 20% 39%, /* E horizon */
+          #b79771 39% 40%,
+          #8f5e3a 40% 69%, /* B horizon */
+          #8f5e3a 69% 70%,
+          #5c3a28 70% 100%  /* C/R horizon */
+        );
+      position: relative;
+    }
+    .horizon-label{ position:absolute; left:10px; padding:.25rem .5rem; border-radius:8px; font-size:.8rem; background: color-mix(in oklab, var(--bg) 70%, transparent); border:1px solid var(--ring) }
+    .horizon-label[data-h="O"]{ top: 18px }
+    .horizon-label[data-h="A"]{ top: 70px }
+    .horizon-label[data-h="E"]{ top: 130px }
+    .horizon-label[data-h="B"]{ top: 210px }
+    .horizon-label[data-h="C"]{ top: 300px }
+
+    /* Floating soil particles (canvas sits behind content) */
+    #soilParticles{ position:absolute; inset:0; z-index:-1; opacity:.5; }
+
+    /* Section base */
+    section { padding: 3.5rem 0; position: relative }
+    section .section-title { font-size: clamp(1.6rem, 1.2vw + 1rem, 2.1rem); margin: 0 0 1rem }
+    .eyebrow { color: var(--accent); text-transform: uppercase; letter-spacing: 2px; font-weight: 800; font-size: .85rem }
+    .muted { color: var(--muted) }
+
+    /* Grid cards */
+    .grid { display:grid; gap: 1.2rem }
+    .grid.auto-fit { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) }
+    .card { background: var(--surface); border:1px solid var(--ring); border-radius: var(--radius); padding: 1.1rem; box-shadow: var(--shadow) }
+
+    /* Timeline */
+    .timeline { position: relative; margin: 1rem 0 }
+    .timeline::before { content:""; position:absolute; left: 12px; top:0; bottom:0; width:3px; background: linear-gradient(var(--accent), transparent) }
+    .tl-item { display:grid; grid-template-columns: 28px 1fr; gap: .9rem; padding: .6rem 0 }
+    .tl-dot { width: 24px; height:24px; border-radius:50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent) }
+
+    /* Team */
+    .team { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) }
+    .member { display:grid; gap:.6rem; align-content:start }
+    .avatar { aspect-ratio: 4/3; border-radius: 14px; background: linear-gradient(135deg, var(--sand), var(--clay)); border:1px solid var(--ring); position:relative; overflow:hidden }
+    .badge { position:absolute; bottom:.6rem; right:.6rem; background: var(--surface); border:1px solid var(--ring); padding:.25rem .5rem; border-radius:999px; font-size:.75rem }
+
+    /* Gallery */
+    .gallery { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .6rem }
+    .gallery figure { margin:0; border-radius:14px; overflow:hidden; border:1px solid var(--ring); cursor:pointer; position:relative }
+    .gallery figcaption { position:absolute; inset:auto 0 0 0; background: linear-gradient(transparent, rgba(0,0,0,.5)); color:#fff; padding:.4rem .6rem; font-size:.8rem }
+
+    /* Sponsors */
+    .marquee { display:flex; gap: 2rem; overflow:hidden; border:1px solid var(--ring); border-radius: var(--radius); background: var(--surface); mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent) }
+    .marquee .row { display:flex; gap:2rem; padding: 1rem; animation: scroll 22s linear infinite }
+    .sponsor { padding:.6rem 1rem; border-radius: 12px; border:1px dashed var(--ring); font-weight: 700; letter-spacing:.4px; white-space: nowrap; }
+    @keyframes scroll { from{ transform: translateX(0) } to{ transform: translateX(-50%) } }
+
+    /* Contact */
+    form { display:grid; gap:.8rem; max-width: 700px }
+    input, textarea, select {
+      background: var(--surface); color: var(--text); border:1px solid var(--ring); border-radius: 12px; padding: .8rem .9rem; font: inherit;
+    }
+    textarea { min-height: 120px; resize: vertical }
+
+    /* Footer */
+    footer { padding: 3rem 0 4rem; border-top: 1px solid var(--ring); margin-top: 2rem; background: color-mix(in oklab, var(--bg) 85%, transparent) }
+
+    /* Reveal on scroll */
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease }
+    .reveal.in { opacity: 1; transform: translateY(0) }
+
+    /* Lightbox */
+    dialog.lightbox { border:none; padding:0; border-radius: 16px; max-width: min(92vw, 1000px); background: var(--surface); }
+    dialog::backdrop { background: rgba(0,0,0,.4) }
+    .lightbox img { width: 100%; height: auto; display: block; }
+    .lightbox .close { position:absolute; top:.6rem; right:.6rem; border:1px solid var(--ring); background: var(--surface); border-radius: 10px; padding:.4rem .6rem }
+
+    /* Dark-mode toggle */
+    .toggle { border:1px solid var(--ring); background: var(--surface); border-radius: 999px; padding:.4rem .6rem; display:flex; gap:.45rem; align-items:center }
+
+    /* Utility */
+    .center { text-align:center }
+    .stack { display:grid; gap:.4rem }
+    .pad { padding: .8rem }
+  </style>
+</head>
+<body>
+  <canvas id="soilParticles" aria-hidden="true"></canvas>
+
+  <header>
+    <div class="container nav" role="navigation" aria-label="Main">
+      <a class="brand" href="#top" aria-label="Soil Judging Club home">
+        <span class="logo" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="10" fill="url(#g)"/>
+            <defs>
+              <radialGradient id="g" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(12 12) rotate(90) scale(10)">
+                <stop stop-color="#c88a5b"/>
+                <stop offset="1" stop-color="#6a4c3b"/>
+              </radialGradient>
+            </defs>
+          </svg>
+        </span>
+        <span>Soil Judging Club<small>Learn • Profile • Compete</small></span>
+      </a>
+
+      <nav>
+        <ul id="navLinks">
+          <li><a href="#about">About</a></li>
+          <li><a href="#events">Events</a></li>
+          <li><a href="#team">Team</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="toggle" id="modeToggle" aria-label="Toggle color mode" title="Toggle color mode">
+          <span aria-hidden="true">🌞</span><span aria-hidden="true">/</span><span aria-hidden="true">🌙</span>
+        </button>
+        <a href="#join" class="btn btn--alt">Join Now</a>
+        <button class="burger" id="burger" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <div>
+          <div class="kicker">Field science • Friendly competition</div>
+          <h1 class="headline">Dig into soil horizons, field skills, and a team that gets its hands dirty.</h1>
+          <p class="subhead">We map profiles, identify textures, and compete regionally & nationally. Whether you’re a seasoned classifier or brand new, you’ll learn fast—and have fun doing it.</p>
+          <div class="cta">
+            <a class="btn" href="#about">What’s Soil Judging?</a>
+            <a class="btn btn--ghost" href="#events">Upcoming Events</a>
+          </div>
+        </div>
+        <div class="soil-card reveal">
+          <div class="soil" role="img" aria-label="Illustrated soil profile with labeled horizons">
+            <span class="horizon-label" data-h="O">O</span>
+            <span class="horizon-label" data-h="A">A</span>
+            <span class="horizon-label" data-h="E">E</span>
+            <span class="horizon-label" data-h="B">B</span>
+            <span class="horizon-label" data-h="C">C/R</span>
+          </div>
+          <div class="pad muted">Tap horizons to learn in-lab (coming soon)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="container">
+        <p class="eyebrow">About us</p>
+        <h2 class="section-title">Hands-on learning, real-world soils</h2>
+        <p class="muted">We train students to describe, classify, and interpret soils in the field. Members visit pits, practice texture-by-feel, and learn to read the landscape. On competition days, you’ll profile unknown pits and defend your calls like a pro.</p>
+
+        <div class="grid auto-fit" style="margin-top:1.2rem">
+          <article class="card reveal">
+            <h3>Learn by doing</h3>
+            <p class="muted">Weekly field labs cover horizonation, Munsell color, structure, and landscape position. Expect plenty of clay under your nails.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Compete & connect</h3>
+            <p class="muted">We travel to regional and national contests, network with agencies and firms, and swap tips with teams across the country.</p>
+          </article>
+          <article class="card reveal">
+            <h3>Careers in the soil</h3>
+            <p class="muted">Members land roles with NRCS, consulting, conservation districts, and grad programs. Field skills → real opportunities.</p>
+          </article>
+        </div>
+
+        <div class="grid auto-fit" style="margin-top:1.2rem">
+          <div class="card center reveal">
+            <div class="stack">
+              <div class="kicker" aria-live="polite"><span class="count" data-target="40">0</span>+</div>
+              <strong>Active members</strong>
+              <span class="muted">Across majors</span>
+            </div>
+          </div>
+          <div class="card center reveal">
+            <div class="stack">
+              <div class="kicker"><span class="count" data-target="12">0</span></div>
+              <strong>Field labs / term</strong>
+              <span class="muted">Rain or shine</span>
+            </div>
+          </div>
+          <div class="card center reveal">
+            <div class="stack">
+              <div class="kicker"><span class="count" data-target="6">0</span></div>
+              <strong>Competitions / yr</strong>
+              <span class="muted">Regional to nationals</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section id="events">
+      <div class="container">
+        <p class="eyebrow">What’s next</p>
+        <h2 class="section-title">Upcoming events & key dates</h2>
+        <div class="timeline">
+          <div class="tl-item reveal">
+            <div class="tl-dot" aria-hidden="true"></div>
+            <div>
+              <strong>Welcome Pit & Texture-by-Feel</strong>
+              <div class="muted">Friday • Teaching Farm Soil Pit • 3–6 PM</div>
+            </div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-dot" aria-hidden="true"></div>
+            <div>
+              <strong>Calibration Day</strong>
+              <div class="muted">Saturday • County Soil Series Tour • 9 AM–4 PM</div>
+            </div>
+          </div>
+          <div class="tl-item reveal">
+            <div class="tl-dot" aria-hidden="true"></div>
+            <div>
+              <strong>Regional Invitational</strong>
+              <div class="muted">Next month • Hosted by NRCS partners</div>
+            </div>
+          </div>
+        </div>
+        <a class="btn btn--alt" href="#join">Add me to the practice list</a>
+      </div>
+    </section>
+
+    <!-- TEAM -->
+    <section id="team">
+      <div class="container">
+        <p class="eyebrow">Meet the team</p>
+        <h2 class="section-title">Officers & coaches</h2>
+        <div class="grid team">
+          <div class="member card reveal">
+            <div class="avatar" role="img" aria-label="Club President placeholder">
+              <div class="badge">President</div>
+            </div>
+            <strong>"Stabbie" Abbie Guza</strong>
+            <span class="muted">B.S. Crop & Soil Science</span>
+          </div>
+          <div class="member card reveal">
+            <div class="avatar" role="img" aria-label="Vice President placeholder">
+              <div class="badge">Vice President</div>
+            </div>
+            <strong>Grace(ial Till) Beam</strong>
+            <span class="muted">B.S. Crop & Soil Science</span>
+          </div>
+          <div class="member card reveal">
+            <div class="avatar" role="img" aria-label="Coach placeholder">
+              <div class="badge">Coach</div>
+            </div>
+            <strong>Dr. Barret Wessel</strong>
+            <span class="muted">Soil Scientist CSS 210 Instructor</span>
+          </div>
+          <div class="member card reveal">
+            <div class="avatar" role="img" aria-label="Treasurer placeholder">
+              <div class="badge">Treasurer</div>
+            </div>
+            <strong>Arianna Reid</strong>
+            <span class="muted">B.S. Environmental Science & Management</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery">
+      <div class="container">
+        <p class="eyebrow">In the field</p>
+        <h2 class="section-title">Photo gallery</h2>
+        <div class="grid gallery">
+          <!-- Placeholder tiles made with gradients; replace src with real images -->
+          <figure class="reveal" data-full="">
+            <img alt="Soil pit practice" src="data:image/svg+xml;utf8,\
+              <svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>\
+                <defs>\
+                  <linearGradient id='g' x1='0' x2='0' y1='0' y2='1'>\
+                    <stop offset='0' stop-color='%23e7dbc8'/>\
+                    <stop offset='1' stop-color='%23a67458'/>\
+                  </linearGradient>\
+                </defs>\
+                <rect width='100%' height='100%' fill='url(%23g)'/>\
+                <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='36' fill='white'>Soil Pit</text>\
+              </svg>" />
+            <figcaption>Soil pit practice</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img alt="Texture by feel" src="data:image/svg+xml;utf8,\
+              <svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>\
+                <defs><linearGradient id='g2' x1='0' x2='1' y1='0' y2='1'>\
+                  <stop offset='0' stop-color='%238bb174'/>\
+                  <stop offset='1' stop-color='%236a4c3b'/>\
+                </linearGradient></defs>\
+                <rect width='100%' height='100%' fill='url(%23g2)'/>\
+                <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='36' fill='white'>Texture by Feel</text>\
+              </svg>" />
+            <figcaption>Texture-by-feel</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img alt="Competition day" src="data:image/svg+xml;utf8,\
+              <svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>\
+                <rect width='100%' height='100%' fill='%23c88a5b'/>\
+                <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='36' fill='white'>Competition Day</text>\
+              </svg>" />
+            <figcaption>Competition day</figcaption>
+          </figure>
+          <figure class="reveal">
+            <img alt="Landscape interpretation" src="data:image/svg+xml;utf8,\
+              <svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'>\
+                <rect width='100%' height='100%' fill='%236a4c3b'/>\
+                <text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='system-ui' font-size='36' fill='white'>Landscape</text>\
+              </svg>" />
+            <figcaption>Landscape interpretation</figcaption>
+          </figure>
+        </div>
+        <dialog class="lightbox" id="lightbox">
+          <button class="close" aria-label="Close">✕</button>
+          <img alt="Expanded gallery item" />
+        </dialog>
+      </div>
+    </section>
+
+    <!-- SPONSORS / PARTNERS -->
+    <section>
+      <div class="container">
+        <p class="eyebrow">Partners</p>
+        <h2 class="section-title">Sponsors & collaborators</h2>
+        <div class="marquee" aria-label="Sponsors scrolling list">
+          <div class="row" aria-hidden="true">
+            <span class="sponsor">NRCS</span>
+            <span class="sponsor">ASA, CSSA, SSSA</span>
+            <span class="sponsor">AgriTech Labs</span>
+            <span class="sponsor">GreenFields Consulting</span>
+            <span class="sponsor">Watershed Alliance</span>
+            <span class="sponsor">EnviroWorks</span>
+          </div>
+          <div class="row" aria-hidden="true" aria-label="Duplicate flow for infinite scroll">
+            <span class="sponsor">NRCS</span>
+            <span class="sponsor">ASA, CSSA, SSSA</span>
+            <span class="sponsor">AgriTech Labs</span>
+            <span class="sponsor">GreenFields Consulting</span>
+            <span class="sponsor">Watershed Alliance</span>
+            <span class="sponsor">EnviroWorks</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOIN -->
+    <section id="join">
+      <div class="container">
+        <div class="card reveal" style="display:grid; grid-template-columns: 1.1fr .9fr; gap:1.2rem; align-items:center">
+          <div>
+            <h2 class="section-title">Join the club</h2>
+            <p class="muted">No experience required. Bring boots, curiosity, and a water bottle. We’ll supply Munsell books, shovels, and snacks.</p>
+            <ul class="muted" style="margin:0; padding-left:1.1rem">
+              <li>Weekly field practice and calibration days</li>
+              <li>Travel to competitions and soil series tours</li>
+              <li>Networking with agencies and industry</li>
+            </ul>
+            <p style="margin:.8rem 0 0"><a class="btn btn--alt" href="#contact">Sign me up</a></p>
+          </div>
+          <div class="soil-card">
+            <div class="soil" aria-hidden="true"></div>
+            <div class="pad muted">You’ll learn to read the profile like a story.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="container">
+        <p class="eyebrow">Get in touch</p>
+        <h2 class="section-title">Contact & interest form</h2>
+        <form class="reveal" id="interestForm">
+          <div class="grid auto-fit">
+            <label class="stack">Full name
+              <input name="name" required placeholder="Your name" />
+            </label>
+            <label class="stack">Email
+              <input type="email" name="email" required placeholder="you@university.edu" />
+            </label>
+          </div>
+          <div class="grid auto-fit">
+            <label class="stack">Major
+              <input name="major" placeholder="e.g., Environmental Science" />
+            </label>
+            <label class="stack">Experience level
+              <select name="level">
+                <option>Beginner</option>
+                <option>Some field experience</option>
+                <option>Competition veteran</option>
+              </select>
+            </label>
+          </div>
+          <label class="stack">What do you want to learn?
+            <textarea name="message" placeholder="Tell us your goals or questions"></textarea>
+          </label>
+          <div style="display:flex; gap:.6rem; align-items:center; flex-wrap:wrap">
+            <button class="btn" type="submit">Submit</button>
+            <span class="muted" id="formStatus" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="grid auto-fit">
+        <div>
+          <div class="brand" style="margin-bottom:.6rem">
+            <span class="logo" aria-hidden="true"></span>
+            <strong>Soil Judging Club</strong>
+          </div>
+          <p class="muted">© <span id="year"></span> Soil Judging Club. Built with ♥ and a lot of loam.</p>
+        </div>
+        <div>
+          <strong>Quick links</strong>
+          <div class="stack">
+            <a href="#about">About</a>
+            <a href="#events">Events</a>
+            <a href="#team">Team</a>
+            <a href="#contact">Contact</a>
+          </div>
+        </div>
+        <div>
+          <strong>Follow</strong>
+          <div class="stack">
+            <a href="#">Instagram</a>
+            <a href="#">GroupChat</a>
+            <a href="#">Email list</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ============================
+    // JS: Interactivity & animations
+    // ============================
+
+    // Mobile menu toggle
+    const burger = document.getElementById('burger');
+    const navLinks = document.getElementById('navLinks');
+    burger?.addEventListener('click', () => {
+      const open = burger.getAttribute('aria-expanded') === 'true';
+      burger.setAttribute('aria-expanded', String(!open));
+      if (!open) {
+        navLinks.style.display = 'grid';
+        navLinks.style.gridTemplateColumns = '1fr';
+        navLinks.style.gap = '.4rem';
+        navLinks.style.padding = '.6rem';
+        navLinks.style.background = getComputedStyle(document.documentElement).getPropertyValue('--surface');
+        navLinks.style.border = '1px solid var(--ring)';
+        navLinks.style.borderRadius = '16px';
+        navLinks.style.position = 'absolute';
+        navLinks.style.top = '60px';
+        navLinks.style.right = '12px';
+        navLinks.style.boxShadow = 'var(--shadow)';
+      } else {
+        navLinks.removeAttribute('style');
+      }
+    });
+
+    // Color mode toggle with localStorage
+    const modeToggle = document.getElementById('modeToggle');
+    const applyTheme = (theme) => {
+      document.documentElement.dataset.theme = theme;
+      if (theme === 'dark') {
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.style.colorScheme = 'light';
+      }
+    }
+    try {
+      const saved = localStorage.getItem('theme');
+      if (saved) applyTheme(saved);
+    } catch {}
+    modeToggle?.addEventListener('click', () => {
+      const current = document.documentElement.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      const next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      try { localStorage.setItem('theme', next); } catch {}
+    });
+
+    // Reveal on scroll
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          e.target.classList.add('in');
+          io.unobserve(e.target);
+        }
+      }
+    }, { threshold: .18 });
+    revealEls.forEach(el => io.observe(el));
+
+    // Count-up stats
+    const counters = document.querySelectorAll('.count');
+    const animateCount = (el) => {
+      const target = parseInt(el.dataset.target||'0', 10);
+      let start = 0;
+      const duration = 1200; // ms
+      const startTime = performance.now();
+      const step = (now) => {
+        const p = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        const value = Math.floor(start + (target - start) * eased);
+        el.textContent = String(value);
+        if (p < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    counters.forEach(el => {
+      const obs = new IntersectionObserver((entries, o) => {
+        if (entries[0].isIntersecting) { animateCount(el); o.disconnect(); }
+      }, { threshold: .5 });
+      obs.observe(el);
+    });
+
+    // Lightbox for gallery
+    const dlg = document.getElementById('lightbox');
+    document.querySelectorAll('#gallery figure').forEach(fig => {
+      fig.addEventListener('click', () => {
+        const img = fig.querySelector('img');
+        dlg.querySelector('img').src = img.src;
+        dlg.showModal();
+      });
+    });
+    dlg?.querySelector('.close')?.addEventListener('click', () => dlg.close());
+    dlg?.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Animated soil particles on canvas
+    const canvas = document.getElementById('soilParticles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    const resize = () => { canvas.width = innerWidth; canvas.height = Math.max(800, innerHeight); };
+    addEventListener('resize', resize); resize();
+    const rand = (a,b)=>a+Math.random()*(b-a);
+    const makeParticle = () => ({
+      x: rand(0, canvas.width),
+      y: rand(-canvas.height*0.3, canvas.height*0.6),
+      r: rand(0.8, 2.2),
+      s: rand(0.2, 0.6),
+      d: rand(0.2, 0.6),
+      c: Math.random() < .4 ? '#a67458' : (Math.random() < .7 ? '#c88a5b' : '#6a4c3b')
+    });
+    const init = (n=160) => { particles = Array.from({length:n}, makeParticle) };
+    init();
+    let last = 0;
+    function tick(t){
+      const dt = Math.min((t - last) / 16, 2); last = t;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.globalAlpha = .35;
+      for (const p of particles){
+        p.y += p.s * dt; p.x += Math.sin((p.y + t*.02) * 0.01) * p.d * dt;
+        if (p.y - p.r > canvas.height) { p.y = -10; p.x = rand(0, canvas.width); }
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+        ctx.fillStyle = p.c; ctx.fill();
+      }
+      requestAnimationFrame(tick);
+    }
+    const mq = matchMedia('(prefers-reduced-motion: reduce)');
+    if (!mq.matches) requestAnimationFrame(tick);
+
+    // Form – fake submit handler
+    const form = document.getElementById('interestForm');
+    const status = document.getElementById('formStatus');
+    form?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      // Simulate async success
+      status.textContent = 'Submitting…';
+      setTimeout(() => {
+        status.textContent = 'Thanks! We\'ll reach out with practice details.';
+        form.reset();
+      }, 700);
+      console.log('Interest form submission', data);
+    });
+  </script>
+</body>
+</html>
